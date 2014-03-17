@@ -1,0 +1,14 @@
+OASISFormat: 0.4
+Name:        humane_re
+Version:     0.0.1
+Synopsis:    A Small and Human Friendly Interface to Regular Expressions in
+  OCaml
+Authors:     Rudi Grinberg
+License:     WTFPL
+Plugins:     META (0.4)
+
+Library humane_re
+  Path:       lib
+  BuildTools: ocamlbuild
+  Modules:    Humane_re
+  
