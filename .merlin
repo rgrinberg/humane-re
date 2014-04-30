@@ -1,0 +1,6 @@
+PKG re
+PKG re.syntax
+S lib
+S lib_test
+B _build/lib
+B _build/lib_test
