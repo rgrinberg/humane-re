@@ -4,11 +4,11 @@ Version:     0.0.1
 Synopsis:    A Small and Human Friendly Interface to Regular Expressions in
   OCaml
 Authors:     Rudi Grinberg
-License:     WTFPL
+License:     LGPL-2.0 with OCaml linking exception
 Plugins:     META (0.4)
 
 Library humane_re
   Path:       lib
   BuildTools: ocamlbuild
   Modules:    Humane_re
-  
+  BuildDepends: re, re.str
