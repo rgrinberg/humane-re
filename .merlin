@@ -1,5 +1,5 @@
 PKG re
-PKG re.syntax
+PKG re.emacs
 S lib
 S lib_test
 B _build/lib
