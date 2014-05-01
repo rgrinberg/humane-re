@@ -1,3 +1,7 @@
+module List = ListLabels
+module String = StringLabels
+module Array = ArrayLabels
+
 module String = struct
   type t = {
     re: Re.t;
@@ -45,10 +49,12 @@ module String = struct
     | None   -> re.srch <- Some (Re.compile re.re);
       get_srch re
 
+  (* searches forward and  *)
   let search_forward re s p =
     let res = Re.exec ~pos:p (get_srch re) s in
     Re.get_ofs res 0
 
+  (* TODO not tail recursive *)
   let split ?(num=0) t text =
     let rec split start n =
       if start > String.length text then [] else
@@ -60,6 +66,7 @@ module String = struct
           [string_after text start] in
     if text = "" then [] else split 0 num
 
+  (* TODO not tail recursive *)
   let split_delim ?(num=0) t text =
     let rec split start n =
       if start >= String.length text then [] else
@@ -77,11 +84,41 @@ module String = struct
           [`Text (string_after text start)] in
     split 0 num
 
-  let find_all t re =
-    let matches = Re.exec
-    in ()
+  module Match = struct
+    type t = {
+      string: str;
+      matches: ((int * int) option) array;
+    }
+    type index = int
+    let of_offsets string offsets =
+      { string ; 
+        matches=(Array.map offsets ~f:(fun (x, y) ->
+          if x = -1 then None else Some (x,y))) }
 
-  let find_matches ({ re ; _ } as t) s =
-    let res = Re.exec re s in
-    ()
+    let get t i = failwith "TODO"
+    let get_pos t i = failwith "TODO"
+    let all_matched t = []
+    let all t = []
+  end
+
+  let fold_left_matches t str ~init ~f =
+    let rec loop acc pos =
+      try
+        let res = Re.exec ~pos (get_srch t) str in
+        let (_, new_pos) = Re.get_ofs res 0 in
+        let match_t = res |> Re.get_all_ofs |> Match.of_offsets str in
+        loop (f acc match_t) new_pos
+      with Not_found -> acc
+    in loop init 0
+
+  let find_matches t s =
+    fold_left_matches t s ~init:[] ~f:(fun acc match_ ->
+      acc @ (Match.all_matched match_))
+
+  let find_all t str =
+    str
+    |> find_matches t
+    |> List.map ~f:(fun m -> m |> Match.all_matched |> List.map ~f:snd)
+    |> List.concat
+
 end
