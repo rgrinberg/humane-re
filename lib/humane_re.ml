@@ -2,7 +2,46 @@ module List = ListLabels
 module String = StringLabels
 module Array = ArrayLabels
 
-module String = struct
+module type S = sig
+  type t
+  type str
+
+  module Match : sig
+    type t
+    type index
+
+    val get : t -> index -> string option
+    val get_pos : t -> index -> (int * int) option
+
+    val fold_left : t -> init:'a -> 
+      f:('a -> pos:(int * int) -> str:str -> 'a) -> 'a
+
+    val all_matched : t -> string list
+    val all : t -> string option list
+  end
+
+  val regexp : string -> t
+  val quote : str -> t
+  val matches : t -> str -> bool
+
+  val split : ?max:int -> t -> str -> str list
+  val split_delim : ?max:int -> t -> str -> [`Text of str | `Delim of str] list
+
+  val fold_left_matches : t -> str -> init:'a -> f:('a -> Match.t -> 'a) -> 'a
+  val find_matches : t -> str -> Match.t list
+  val find_all : t -> str -> string list
+
+  val replace_all_group : t -> str -> 
+    f:(Match.t -> [`Replace of str | `Keep ] list) -> str
+  val replace_all : t -> str -> f:(str -> str) -> str
+
+  module Infix : sig
+    val (=~) : str -> t -> bool
+  end
+end
+
+
+module Str : (S with type str := string) = struct
   type t = {
     re: Re.t;
     mutable mtch: Re.re option;
@@ -41,6 +80,10 @@ module String = struct
       true
     with Not_found -> false
 
+  module Infix = struct
+    let (=~) s re = matches re s
+  end
+
   let string_after s n = String.sub s n (String.length s - n)
 
   let rec get_srch re =
@@ -55,7 +98,7 @@ module String = struct
     Re.get_ofs res 0
 
   (* TODO not tail recursive *)
-  let split ?(num=0) t text =
+  let split ?(max=0) t text =
     let rec split start n =
       if start > String.length text then [] else
       if n = 1 then [string_after text start] else
@@ -64,10 +107,10 @@ module String = struct
           String.sub text start (pos-start) :: split match_end (n-1)
         with Not_found ->
           [string_after text start] in
-    if text = "" then [] else split 0 num
+    if text = "" then [] else split 0 max
 
   (* TODO not tail recursive *)
-  let split_delim ?(num=0) t text =
+  let split_delim ?(max=0) t text =
     let rec split start n =
       if start >= String.length text then [] else
       if n = 1 then [`Text (string_after text start)] else
@@ -82,7 +125,7 @@ module String = struct
             `Delim (s) :: split match_end (n-1)
         with Not_found ->
           [`Text (string_after text start)] in
-    split 0 num
+    split 0 max
 
   module Match = struct
     type t = {
@@ -99,6 +142,7 @@ module String = struct
     let get_pos t i = failwith "TODO"
     let all_matched t = []
     let all t = []
+    let fold_left t ~init ~f = failwith "TODO"
   end
 
   let fold_left_matches t str ~init ~f =
@@ -121,4 +165,6 @@ module String = struct
     |> List.map ~f:(fun m -> m |> Match.all_matched |> List.map ~f:snd)
     |> List.concat
 
+  let replace_all t s ~f = failwith "TODO"
+  let replace_all_group t s ~f = failwith "TODO"
 end
