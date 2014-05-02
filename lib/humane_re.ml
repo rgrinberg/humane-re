@@ -13,9 +13,10 @@ module type Match = sig
   val fold_left : t -> init:'a -> 
     f:('a -> pos:(int * int) -> str:str -> 'a) -> 'a
 
-  val all_matched : t -> str list
-  val all : t -> str option list
+  val all : t -> str list
+  val alli : t -> (index * string) list
 end
+
 
 module type S = sig
   type t
@@ -137,8 +138,7 @@ module Str : (S with type str := string) = struct
       matches: (int * int) array;
     }
     type index = int
-    let of_offsets string matches =
-      { string ; matches }
+    let of_offsets string matches = { string ; matches }
 
     let get_pos { matches ; _ } i =
       try Some matches.(i)
@@ -150,8 +150,17 @@ module Str : (S with type str := string) = struct
       | Some (pos, stop) -> 
         Some (String.sub t.string ~pos ~len:(stop - pos))
 
-    let all_matched t = []
-    let all t = []
+    let alli t =
+      let rec loop acc i =
+        if i = -1 then acc
+        else
+          match get t i with
+          | None -> loop acc (pred i)
+          | Some s -> loop ((i, s)::acc) (pred i)
+      in loop [] (Array.length t.matches - 1)
+
+    let all t = t |> alli |> List.map ~f:snd
+
     let fold_left t ~init ~f = failwith "TODO"
   end
 
@@ -167,12 +176,12 @@ module Str : (S with type str := string) = struct
 
   let find_matches t s =
     fold_left_matches t s ~init:[] ~f:(fun acc match_ ->
-      acc @ (Match.all_matched match_))
+      match_::acc)
 
   let find_all t str =
     str
     |> find_matches t
-    |> List.map ~f:(fun m -> m |> Match.all_matched |> List.map ~f:snd)
+    |> List.map ~f:(fun m -> m |> Match.all)
     |> List.concat
 
   let replace_all t s ~f = failwith "TODO"

@@ -9,8 +9,8 @@ module type Match = sig
   val fold_left : t -> init:'a -> 
     f:('a -> pos:(int * int) -> str:str -> 'a) -> 'a
 
-  val all_matched : t -> str list
-  val all : t -> str option list
+  val all : t -> str list
+  val alli : t -> (index * string) list
 end
 
 module type S = sig
@@ -38,7 +38,6 @@ module type S = sig
     val (=~) : str -> t -> bool
   end
 end
-
 
 
 (* module String : (module S with str = string) *)
