@@ -131,18 +131,25 @@ module Str : (S with type str := string) = struct
     split 0 max
 
   module Match = struct
+    type str = string
     type t = {
       string: str;
-      matches: ((int * int) option) array;
+      matches: (int * int) array;
     }
     type index = int
-    let of_offsets string offsets =
-      { string ;
-        matches=(Array.map offsets ~f:(fun (x, y) ->
-          if x = -1 then None else Some (x,y))) }
+    let of_offsets string matches =
+      { string ; matches }
 
-    let get t i = failwith "TODO"
-    let get_pos t i = failwith "TODO"
+    let get_pos { matches ; _ } i =
+      try Some matches.(i)
+      with Not_found -> None
+
+    let get t i =
+      match get_pos t i with
+      | None -> None
+      | Some (pos, stop) -> 
+        Some (String.sub t.string ~pos ~len:(stop - pos))
+
     let all_matched t = []
     let all t = []
     let fold_left t ~init ~f = failwith "TODO"
