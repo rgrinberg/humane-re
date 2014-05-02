@@ -2,50 +2,10 @@ module List = ListLabels
 module String = StringLabels
 module Array = ArrayLabels
 
-module type Match = sig
-  type t
-  type str
-  type index
+module type S = (module type of S)
+open S
 
-  val get : t -> index -> str option
-  val get_pos : t -> index -> (int * int) option
-
-  val fold_left : t -> init:'a -> 
-    f:('a -> pos:(int * int) -> str:str -> 'a) -> 'a
-
-  val all : t -> str list
-  val alli : t -> (index * string) list
-end
-
-
-module type S = sig
-  type t
-  type str
-
-  module Match : Match with type str = str
-
-  val regexp : string -> t
-  val quote : str -> t
-  val matches : t -> str -> bool
-
-  val split : ?max:int -> t -> str -> str list
-  val split_delim : ?max:int -> t -> str -> [`Text of str | `Delim of str] list
-
-  val fold_left_matches : t -> str -> init:'a -> f:('a -> Match.t -> 'a) -> 'a
-  val find_matches : t -> str -> Match.t list
-  val find_all : t -> str -> string list
-
-  val replace_all_group : t -> str -> 
-    f:(Match.t -> [`Replace of str | `Keep ] list) -> str
-  val replace_all : t -> str -> f:(str -> str) -> str
-
-  module Infix : sig
-    val (=~) : str -> t -> bool
-  end
-end
-
-
-module Str : (S with type str := string) = struct
+module Str : (Re with type str := string) = struct
   type t = {
     re: Re.t;
     mutable mtch: Re.re option;
@@ -135,26 +95,30 @@ module Str : (S with type str := string) = struct
     type str = string
     type t = {
       string: str;
+      (* first element is the coordinate of the full match. all groups
+         included. This is not really the cleanest representation but we reuse
+         it to avoid copying *)
       matches: (int * int) array;
     }
     type index = int
+
     let of_offsets string matches = { string ; matches }
 
-    let get_pos { matches ; _ } i =
+    let group_pos { matches ; _ } i =
       try Some matches.(i)
       with Not_found -> None
 
-    let get t i =
-      match get_pos t i with
+    let group t i =
+      match group_pos t i with
       | None -> None
       | Some (pos, stop) -> 
         Some (String.sub t.string ~pos ~len:(stop - pos))
 
     let alli t =
       let rec loop acc i =
-        if i = -1 then acc
+        if i = 0 then acc
         else
-          match get t i with
+          match group t i with
           | None -> loop acc (pred i)
           | Some s -> loop ((i, s)::acc) (pred i)
       in loop [] (Array.length t.matches - 1)
@@ -162,6 +126,12 @@ module Str : (S with type str := string) = struct
     let all t = t |> alli |> List.map ~f:snd
 
     let fold_left t ~init ~f = failwith "TODO"
+
+    let full_match_pos { matches ; _ } = matches.(0)
+
+    let full_match { string ; matches } =
+      let (pos, stop) = matches.(0) in
+      String.sub string ~pos ~len:(stop - pos)
   end
 
   let fold_left_matches t str ~init ~f =
@@ -184,6 +154,8 @@ module Str : (S with type str := string) = struct
     |> List.map ~f:(fun m -> m |> Match.all)
     |> List.concat
 
-  let replace_all t s ~f = failwith "TODO"
   let replace_all_group t s ~f = failwith "TODO"
+
+  let replace_all t s ~f = failwith "TODO"
+
 end
