@@ -134,7 +134,7 @@ module Str : (S with type str := string) = struct
     }
     type index = int
     let of_offsets string offsets =
-      { string ; 
+      { string ;
         matches=(Array.map offsets ~f:(fun (x, y) ->
           if x = -1 then None else Some (x,y))) }
 
