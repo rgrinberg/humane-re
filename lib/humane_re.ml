@@ -180,11 +180,14 @@ module Str = struct
   let find_concat_groups t str =
     str
     |> find_groups t
-    |> List.map ~f:(fun m -> m |> Group.all)
+    |> List.map ~f:Group.all
     |> List.concat
 
   let replace_all_group t ~f s = failwith "TODO"
 
-  let replace_all t ~f s = failwith "TODO"
+  let replace_all t ~f =
+    replace_all_group t ~f:(fun g ->
+      failwith "TODO"
+    )
 
 end
