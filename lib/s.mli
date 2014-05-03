@@ -1,11 +1,14 @@
+type 'a substr = < pos : int * int ; str : 'a >
+
 module type Group = sig
   type t
+  type str
   type index
 
   val group : t -> index -> str option
   val group_pos : t -> index -> (int * int) option
 
-  val fold_left : t -> init:'a -> f:('a -> str Lazy.t -> int * int -> 'a) -> 'a
+  val fold_left : t -> init:'a -> f:('a -> str substr -> 'a) -> 'a
 
   val all : t -> str list
   val alli : t -> (index * str) list
@@ -13,11 +16,12 @@ module type Group = sig
   val full_match : t -> str
   val full_match_pos : t -> int * int
 
-  val map : Group.t -> f:(str Lazy.t -> int * int -> str) -> Group.t
+  val map : t -> f:(str substr -> str) -> t
 end
 
 module type Re = sig
   type t
+  type str
 
   module Group : Group
 
