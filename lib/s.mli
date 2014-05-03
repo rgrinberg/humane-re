@@ -7,7 +7,7 @@ module type Match = sig
   val group_pos : t -> index -> (int * int) option
 
   val fold_left : t -> init:'a -> 
-    f:('a -> pos:(int * int) -> str:str -> 'a) -> 'a
+    f:('a -> < pos : int * int ; str : str > -> 'a) -> 'a
 
   val all : t -> str list
   val alli : t -> (index * string) list

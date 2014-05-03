@@ -5,7 +5,7 @@ module Array = ArrayLabels
 module type S = (module type of S)
 open S
 
-module Str : (Re with type str := string) = struct
+module Str = struct
   type t = {
     re: Re.t;
     mutable mtch: Re.re option;
@@ -125,7 +125,16 @@ module Str : (Re with type str := string) = struct
 
     let all t = t |> alli |> List.map ~f:snd
 
-    let fold_left t ~init ~f = failwith "TODO"
+    let fold_left ({ string ; matches } as t) ~init ~f =
+      let acc = ref init in
+      for i = 1 to Array.length matches - 1 do
+        acc := f !acc 
+                 (object
+                   method pos = matches.(i);
+                   method str = group t i
+                 end)
+      done;
+      !acc
 
     let full_match_pos { matches ; _ } = matches.(0)
 
