@@ -11,4 +11,5 @@ Library humane_re
   Path:       lib
   BuildTools: ocamlbuild
   Modules:    Humane_re
-  BuildDepends: re, re.str
+  BuildDepends: re, re.emacs
+  InternalModules: S
