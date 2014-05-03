@@ -1,47 +1,45 @@
 module type Group = sig
   type t
-  type str
   type index
 
-  val group : t -> index -> str option
+  val group : t -> index -> string option
   val group_pos : t -> index -> (int * int) option
 
-  val fold_left : t -> init:'a -> f:('a -> str Lazy.t -> int * int -> 'a) -> 'a
+  val fold_left : t -> init:'a -> f:('a -> string Lazy.t -> int * int -> 'a) -> 'a
 
-  val all : t -> str list
-  val alli : t -> (index * str) list
+  val all : t -> string list
+  val alli : t -> (index * string) list
 
-  val full_match : t -> str
+  val full_match : t -> string
   val full_match_pos : t -> int * int
 
-  val map : Group.t -> f:(str Lazy.t -> int * int -> str) -> Group.t
+  val map : t -> f:(string Lazy.t -> int * int -> string) -> t
 end
 
 module type Re = sig
   type t
-  type str
 
-  module Group : Group with type str = str
+  module Group : Group
 
   val regexp : string -> t
-  val quote : str -> t
-  val matches : t -> str -> bool
+  val quote : string -> t
+  val matches : t -> string -> bool
 
-  val split : ?max:int -> t -> str -> str list
-  val split_delim : ?max:int -> t -> str -> [`Text of str | `Delim of str] list
+  val split : ?max:int -> t -> string -> string list
+  val split_delim : ?max:int -> t -> string -> [`Text of string | `Delim of string] list
 
-  val fold_left_groups : t -> str -> init:'a -> f:('a -> Group.t -> 'a) ->'a
-  val find_groups : t -> str -> Group.t list
-  val find_concat_groups : t -> str -> str list
+  val fold_left_groups : t -> string -> init:'a -> f:('a -> Group.t -> 'a) ->'a
+  val find_groups : t -> string -> Group.t list
+  val find_concat_groups : t -> string -> string list
 
-  val fold_left_match : t -> str -> init:'a -> f:('a -> str substr -> 'a) -> 'a
-  val find_matches : t -> str -> string list
+  val fold_left_match : t -> string -> init:'a -> f:('a -> string substr -> 'a) -> 'a
+  val find_matches : t -> string -> string list
 
   val replace_all_group : t ->
-    f:(Group.t -> Group.t) -> str -> str
-  val replace_all : t -> f:(str -> str) -> str -> str
+    f:(Group.t -> Group.t) -> string -> string
+  val replace_all : t -> f:(string -> string) -> string -> string
 
   module Infix : sig
-    val (=~) : str -> t -> bool
+    val (=~) : string -> t -> bool
   end
 end
