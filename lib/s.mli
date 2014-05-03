@@ -9,7 +9,7 @@ module type Group = sig
   val fold_left : t -> init:'a -> f:('a -> str Lazy.t -> int * int -> 'a) -> 'a
 
   val all : t -> str list
-  val alli : t -> (index * string) list
+  val alli : t -> (index * str) list
 
   val full_match : t -> str
   val full_match_pos : t -> int * int
