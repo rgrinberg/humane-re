@@ -91,7 +91,7 @@ module Str = struct
           [`Text (string_after text start)] in
     split 0 max
 
-  module Match = struct
+  module Group = struct
     type str = string
     type t = {
       string: str;
@@ -105,7 +105,11 @@ module Str = struct
     let of_offsets string matches = { string ; matches }
 
     let group_pos { matches ; _ } i =
-      try Some matches.(i)
+      try 
+        let m = matches.(i) in
+        if fst m = -1
+        then None
+        else Some m
       with Not_found -> None
 
     let group t i =
@@ -125,14 +129,20 @@ module Str = struct
 
     let all t = t |> alli |> List.map ~f:snd
 
+    let some_exn = function
+      | Some x -> x
+      | _ -> assert false
+
     let fold_left ({ string ; matches } as t) ~init ~f =
       let acc = ref init in
       for i = 1 to Array.length matches - 1 do
-        acc := f !acc 
-                 (object
-                   method pos = matches.(i);
-                   method str = group t i
-                 end)
+        let pos = matches.(i) in
+        if fst pos <> -1 then
+          acc := f !acc 
+                   (object
+                     method pos = matches.(i);
+                     method str = some_exn (group t i)
+                   end)
       done;
       !acc
 
@@ -143,28 +153,38 @@ module Str = struct
       String.sub string ~pos ~len:(stop - pos)
   end
 
-  let fold_left_matches t str ~init ~f =
+  let fold_left_groups t str ~init ~f =
     let rec loop acc pos =
       try
         let res = Re.exec ~pos (get_srch t) str in
         let (_, new_pos) = Re.get_ofs res 0 in
-        let match_t = res |> Re.get_all_ofs |> Match.of_offsets str in
+        let match_t = res |> Re.get_all_ofs |> Group.of_offsets str in
         loop (f acc match_t) new_pos
       with Not_found -> acc
     in loop init 0
 
-  let find_matches t s =
-    fold_left_matches t s ~init:[] ~f:(fun acc match_ ->
-      match_::acc)
+  let fold_left_match t str ~init ~f =
+    fold_left_groups t str ~init ~f:(fun acc match_ ->
+      f acc @@ object
+        method pos = Group.full_match_pos match_
+        method str = Group.full_match match_
+      end)
 
-  let find_all t str =
+  let find_groups t str =
+    fold_left_groups t str ~init:[] ~f:List.(fun acc x -> x::acc)
+
+  let find_matches t s =
+    fold_left_match t s ~init:[] ~f:(fun acc match_ ->
+      (match_ # str)::acc)
+
+  let find_concat_groups t str =
     str
-    |> find_matches t
-    |> List.map ~f:(fun m -> m |> Match.all)
+    |> find_groups t
+    |> List.map ~f:(fun m -> m |> Group.all)
     |> List.concat
 
-  let replace_all_group t s ~f = failwith "TODO"
+  let replace_all_group t ~f s = failwith "TODO"
 
-  let replace_all t s ~f = failwith "TODO"
+  let replace_all t ~f s = failwith "TODO"
 
 end
