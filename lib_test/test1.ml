@@ -29,7 +29,17 @@ let test_find_groups _ =
   let re = Str.regexp "\\([0-9][0-9]\\) \\([a-z]+\\)" in
   let str = "12 fruit 15 apples XXX YYY 19 things" in
   let groups = Str.find_groups re str in
-  assert_equal (List.length groups) 3 ~printer:string_of_int
+  assert_equal (List.length groups) 3 ~printer:string_of_int;
+  let s = [("12 fruit", "12", "fruit");
+           ("15 apples", "15", "apples");
+           ("19 things", "19", "things")] in
+  let s' = groups |> List.map (fun g ->
+    let fm = Str.Group.full_match g in
+    match Str.Group.all g with
+    | [x ; y] -> (fm, x, y)
+    | _ -> assert_failure "did not match 2 elems"
+  ) in
+  assert_equal s s'
 
 let test_fixtures =
   "test Humane_re.Str" >:::
