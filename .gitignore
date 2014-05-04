@@ -7,3 +7,5 @@ setup.ml
 *.mldylib
 *.mllib
 META
+*.native
+*.byte
