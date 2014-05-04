@@ -43,6 +43,7 @@ module type Re = sig
   val quote : str -> t
   val matches : t -> str -> bool
 
+  (* TODO add folding over splits? *)
   val split : ?max:int -> t -> str -> str list
   val split_delim : ?max:int -> t -> str -> [`Text of str | `Delim of str] list
 
@@ -53,7 +54,7 @@ module type Re = sig
   val fold_left_match : t -> str -> init:'a -> f:('a -> str substr -> 'a) -> 'a
   val find_matches : t -> str -> string list
 
-  (* XXX given up on replacement for now. will revisit once I'm content
+  (* TODO given up on replacement for now. will revisit once I'm content
      with an interface*)
 
   module Infix : sig
