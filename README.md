@@ -8,4 +8,4 @@ Courtesy of ocaml-re, it's also:
 
 * C/C++ dependencies (re2, pcre)
 
-* Global variables (builtin str)
+* Global variables (str)
