@@ -2,8 +2,7 @@ open OUnit2
 
 module Str = Humane_re.Str
 
-let printer strings = 
-  "[" ^ (String.concat " " strings) ^ "]"
+let printer strings = "[" ^ (String.concat " " strings) ^ "]"
 
 let test_split_simple _ =
   let re = Str.regexp "_\\| " in
@@ -26,12 +25,19 @@ let test_find_concat_groups _ =
   let s' = Str.find_concat_groups re str in
   assert_equal s s' ~printer
 
+let test_find_groups _ =
+  let re = Str.regexp "\\([0-9][0-9]\\) \\([a-z]+\\)" in
+  let str = "12 fruit 15 apples XXX YYY 19 things" in
+  let groups = Str.find_groups re str in
+  assert_equal (List.length groups) 3 ~printer:string_of_int
+
 let test_fixtures =
   "test Humane_re.Str" >:::
   [
     "test split simple" >:: test_split_simple;
     "test find matches" >:: test_find_matches;
     "test find concat groups" >:: test_find_concat_groups;
+    "test find groups" >:: test_find_groups;
   ]
 
 let _ = run_test_tt_main test_fixtures
