@@ -5,10 +5,23 @@ Synopsis:    A human friendly interface to regular expressions in OCaml
 Authors:     Rudi Grinberg
 License:     LGPL-2.0 with OCaml linking exception
 Plugins:     META (0.4)
+BuildTools: ocamlbuild
 
 Library humane_re
   Path:       lib
-  BuildTools: ocamlbuild
   Modules:    Humane_re
   BuildDepends: re, re.emacs
   InternalModules: S
+
+Executable test1
+  Path:               lib_test
+  MainIs:             test1.ml
+  Custom:             true
+  CompiledObject:     best
+  Install:            false
+  BuildDepends:       humane_re, oUnit
+
+
+Test test1
+  Command:            $test1
+  WorkingDirectory:   lib_test
