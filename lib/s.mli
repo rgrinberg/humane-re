@@ -37,7 +37,7 @@ module type Re = sig
   type t
   type str
 
-  module Group : Group
+  module Group : Group with type str = str
 
   val regexp : string -> t
   val quote : str -> t
