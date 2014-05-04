@@ -186,10 +186,12 @@ module Str = struct
 
   let find_groups t str =
     fold_left_groups t str ~init:[] ~f:List.(fun acc x -> x::acc)
+    |> List.rev
 
   let find_matches t s =
-    fold_left_match t s ~init:[] ~f:(fun acc match_ ->
-      (match_ # str)::acc)
+    fold_left_match t s ~init:[]
+      ~f:(fun acc match_ -> (match_ # str)::acc)
+    |> List.rev
 
   let find_concat_groups t str =
     str
