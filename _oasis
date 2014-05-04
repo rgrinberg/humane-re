@@ -1,8 +1,7 @@
 OASISFormat: 0.4
 Name:        humane_re
 Version:     0.0.1
-Synopsis:    A Small and Human Friendly Interface to Regular Expressions in
-  OCaml
+Synopsis:    A human friendly interface to regular expressions in OCaml
 Authors:     Rudi Grinberg
 License:     LGPL-2.0 with OCaml linking exception
 Plugins:     META (0.4)
