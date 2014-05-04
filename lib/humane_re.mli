@@ -1,5 +1,5 @@
 module type S = (module type of S)
 
 module Str : sig
-  include S.Re
+  include S.Re with type str = string
 end

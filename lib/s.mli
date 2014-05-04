@@ -1,4 +1,20 @@
 type 'a substr = < pos : int * int ; str : 'a >
+type 'a replace = [`Replace of 'a | `Keep]
+
+(* the current proposed interface for replacement. doesn't look pretty. *)
+module type Replace = sig
+  type t
+  type str
+  type group
+
+  (* not sure whether to expose this one at all *)
+  val replace_in_string : t -> str substr -> str replace -> str
+
+  val replace_group : t ->
+    f:(group -> t) -> str -> str
+  val replace_match : t -> f:(str substr -> str) -> str
+  val replace_all : t -> f:(str -> str) -> str -> str
+end
 
 module type Group = sig
   type t
@@ -15,8 +31,6 @@ module type Group = sig
 
   val full_match : t -> str
   val full_match_pos : t -> int * int
-
-  val map : t -> f:(str substr -> str) -> t
 end
 
 module type Re = sig
@@ -39,9 +53,8 @@ module type Re = sig
   val fold_left_match : t -> str -> init:'a -> f:('a -> str substr -> 'a) -> 'a
   val find_matches : t -> str -> string list
 
-  val replace_all_group : t ->
-    f:(Group.t -> Group.t) -> str -> str
-  val replace_all : t -> f:(str -> str) -> str -> str
+  (* XXX given up on replacement for now. will revisit once I'm content
+     with an interface*)
 
   module Infix : sig
     val (=~) : str -> t -> bool

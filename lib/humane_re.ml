@@ -31,6 +31,7 @@ module Str = struct
         buf.[!pos] <- c; pos := !pos + 1
     done;
     (String.sub buf 0 !pos) |> regexp
+  ;;
 
   let rec get_mtch re =
     match re.mtch with
@@ -72,6 +73,7 @@ module Str = struct
         with Not_found ->
           [string_after text start] in
     if text = "" then [] else split 0 max
+  ;;
 
   (* TODO not tail recursive *)
   let split_delim ?(max=0) t text =
@@ -90,6 +92,7 @@ module Str = struct
         with Not_found ->
           [`Text (string_after text start)] in
     split 0 max
+  ;;
 
   module Group = struct
     type str = string
@@ -118,6 +121,15 @@ module Str = struct
       | Some (pos, stop) -> 
         Some (String.sub t.string ~pos ~len:(stop - pos))
 
+    let group_substr t i =
+      match group_pos t i with
+      | None -> None
+      | Some (pos, stop) ->
+          Some (object
+            method pos = (pos, stop)
+            method str = String.sub t.string ~pos ~len:(stop - pos)
+          end)
+
     let alli t =
       let rec loop acc i =
         if i = 0 then acc
@@ -140,17 +152,19 @@ module Str = struct
         if fst pos <> -1 then
           acc := f !acc 
                    (object
-                     method pos = matches.(i);
+                     method pos = matches.(i)
                      method str = some_exn (group t i)
                    end)
       done;
       !acc
+    ;;
 
     let full_match_pos { matches ; _ } = matches.(0)
 
     let full_match { string ; matches } =
       let (pos, stop) = matches.(0) in
       String.sub string ~pos ~len:(stop - pos)
+
   end
 
   let fold_left_groups t str ~init ~f =
@@ -182,12 +196,4 @@ module Str = struct
     |> find_groups t
     |> List.map ~f:Group.all
     |> List.concat
-
-  let replace_all_group t ~f s = failwith "TODO"
-
-  let replace_all t ~f =
-    replace_all_group t ~f:(fun g ->
-      failwith "TODO"
-    )
-
 end
