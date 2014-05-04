@@ -1,5 +1,6 @@
 PKG re
 PKG re.emacs
+PKG oUnit
 S lib
 S lib_test
 B _build/lib
