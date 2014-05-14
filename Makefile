@@ -24,11 +24,14 @@ clean:
 	ocaml setup.ml -clean
 
 scrub: clean
-	ocaml setup.ml -distclean
+	# ocaml setup.ml -distclean
 	rm -rf _tags
 	rm -rf myocamlbuild.ml
 	rm -rf META
 	rm -rf setup.ml
+	rm -rf lib/*.mllib
+	rm -rf lib/*.mlpack
+	rm -rf lib/*.mldylib
 
 install:
 	ocaml setup.ml -install
