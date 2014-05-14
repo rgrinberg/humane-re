@@ -9,9 +9,9 @@ BuildTools: ocamlbuild
 
 Library humane_re
   Path:       lib
-  Modules:    Humane_re
   BuildDepends: re, re.emacs
-  InternalModules: S
+  Pack:       true
+  Modules: S, Str
 
 Executable test1
   Path:               lib_test
