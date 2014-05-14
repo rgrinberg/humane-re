@@ -6,6 +6,7 @@ setup.log
 setup.ml
 *.mldylib
 *.mllib
+*.mlpack
 META
 *.native
 *.byte
