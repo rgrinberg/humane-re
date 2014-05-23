@@ -10,8 +10,7 @@ module type Replace = sig
   (* not sure whether to expose this one at all *)
   val replace_in_string : t -> str substr -> str replace -> str
 
-  val replace_group : t ->
-    f:(group -> t) -> str -> str
+  val replace_group : t -> f:(group -> t) -> str -> str
   val replace_match : t -> f:(str substr -> str) -> str
   val replace_all : t -> f:(str -> str) -> str -> str
 end
