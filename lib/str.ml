@@ -4,8 +4,8 @@ module Array = ArrayLabels
 
 type t = {
   re: Re.t;
-  mutable mtch: Re.re option;
-  mutable srch: Re.re option;
+  mutable mtch: Re.re option; (* match re; we prepend '^' *)
+  mutable srch: Re.re option; (* search re, says as is *)
 }
 
 type str = string
