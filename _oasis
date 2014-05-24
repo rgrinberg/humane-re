@@ -21,7 +21,14 @@ Executable test1
   Install:            false
   BuildDepends:       humane_re, oUnit
 
+Executable test_blog_post
+  Path:               lib_test
+  MainIs:             test_blog_post.ml
+  Custom:             true
+  CompiledObject:     best
+  Install:            false
+  BuildDepends:       humane_re, oUnit
 
 Test test1
-  Command:            $test1
+  Command:            $test_blog_post
   WorkingDirectory:   lib_test
