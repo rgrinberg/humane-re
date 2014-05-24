@@ -4,15 +4,16 @@ type 'a replace = [`Replace of 'a | `Keep]
 (* the current proposed interface for replacement. doesn't look pretty. *)
 module type Replace = sig
   type t
+  type re
   type str
   type group
 
   (* not sure whether to expose this one at all *)
-  val replace_in_string : t -> str substr -> str replace -> str
+  val replace_in_string : re -> str substr -> str replace -> str
 
-  val replace_group : t -> f:(group -> t) -> str -> str
-  val replace_match : t -> f:(str substr -> str) -> str
-  val replace_all : t -> f:(str -> str) -> str -> str
+  val replace_group : re -> f:(group -> t) -> str -> str
+  val replace_match : re -> f:(str substr -> str) -> str
+  val replace_all : re -> f:(str -> str) -> str -> str
 end
 
 module type Group = sig
