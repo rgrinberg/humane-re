@@ -117,6 +117,11 @@ module Group = struct
     | Some (pos, stop) -> 
       Some (String.sub t.string ~pos ~len:(stop - pos))
 
+  let group_exn t i =
+    match group t i with
+    | None -> raise Not_found
+    | Some x -> x
+
   let group_substr t i =
     match group_pos t i with
     | None -> None
@@ -139,7 +144,7 @@ module Group = struct
 
   let some_exn = function
     | Some x -> x
-    | _ -> assert false
+    | _ -> invalid_arg "some_exn"
 
   let fold_left ({ string ; matches } as t) ~init ~f =
     let acc = ref init in
