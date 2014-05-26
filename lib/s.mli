@@ -32,6 +32,14 @@ module type Group = sig
   val full_match_pos : t -> int * int
 end
 
+module type Search = sig
+  type re
+  type str
+
+  val forward : ?start:int -> re -> str -> str substr option
+  (* val backward : ... *)
+end
+
 module type Re = sig
   type t (** The type of regular expression *)
   type str (** The type of string we match on *)

@@ -199,3 +199,17 @@ let find_concat_groups t str =
   |> find_groups t
   |> List.map ~f:Group.all
   |> List.concat
+
+module Search = struct
+  type re = t
+  type str = string
+  let forward ?(start=0) re str =
+    try
+      let res = Re.exec ~pos:start (get_srch re) str in
+      Some (object (self)
+        val pos = Re.get_ofs res 0
+        method pos = pos
+        method str = String.sub str ~pos:(fst pos) ~len:((snd pos) - (fst pos))
+      end)
+    with Not_found -> None
+end
