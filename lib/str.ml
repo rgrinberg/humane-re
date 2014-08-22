@@ -104,7 +104,7 @@ module Group = struct
   let of_offsets string matches = { string ; matches }
 
   let group_pos { matches ; _ } i =
-    try 
+    try
       let m = matches.(i) in
       if fst m = -1
       then None
@@ -114,7 +114,7 @@ module Group = struct
   let group t i =
     match group_pos t i with
     | None -> None
-    | Some (pos, stop) -> 
+    | Some (pos, stop) ->
       Some (String.sub t.string ~pos ~len:(stop - pos))
 
   let group_exn t i =
@@ -151,7 +151,7 @@ module Group = struct
     for i = 1 to Array.length matches - 1 do
       let pos = matches.(i) in
       if fst pos <> -1 then
-        acc := f !acc 
+        acc := f !acc
                  (object
                    method pos = matches.(i)
                    method str = some_exn (group t i)
