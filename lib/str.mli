@@ -1,3 +1,4 @@
+(** See s.mli for documentation *)
 module Group : (S.Group with type index = int
                          and type str = string)
 
