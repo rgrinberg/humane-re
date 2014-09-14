@@ -54,9 +54,13 @@ let rec get_srch re =
     get_srch re
 
 (* searches forward and  *)
-let search_forward re s p =
+let search_forward_exn re s p =
   let res = Re.exec ~pos:p (get_srch re) s in
   Re.get_ofs res 0
+
+let search_forward re s p =
+  try Some (search_forward_exn re s p)
+  with Not_found -> None
 
 (* TODO not tail recursive *)
 let split ?(max=0) t text =
@@ -64,7 +68,7 @@ let split ?(max=0) t text =
     if start > String.length text then [] else
     if n = 1 then [string_after text start] else
       try
-        let (pos, match_end) = search_forward t text start in
+        let (pos, match_end) = search_forward_exn t text start in
         String.sub text start (pos-start) :: split match_end (n-1)
       with Not_found ->
         [string_after text start] in
@@ -77,7 +81,7 @@ let split_delim ?(max=0) t text =
     if start >= String.length text then [] else
     if n = 1 then [`Text (string_after text start)] else
       try
-        let (pos, match_end) = search_forward t text start in
+        let (pos, match_end) = search_forward_exn t text start in
         let s = String.sub text pos (match_end - pos) in
         if pos > start then
           `Text (String.sub text start (pos-start)) ::
