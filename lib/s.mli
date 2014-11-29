@@ -3,6 +3,8 @@
 (** A slice of a string *)
 type 'a substr = < pos : int * int ; str : 'a >
 
+type 'a split_token = [`Token of 'a substr | `Delim of 'a substr]
+
 module type Group = sig
   type t
   type str
@@ -32,14 +34,6 @@ module type Group = sig
   val full_match_pos : t -> int * int
 end
 
-module type Search = sig
-  type re
-  type str
-
-  val forward : ?start:int -> re -> str -> str substr option
-  (* val backward : ... *)
-end
-
 module type Re = sig
   type t (** The type of regular expression *)
   type str (** The type of string we match on *)
@@ -53,9 +47,11 @@ module type Re = sig
   (** return true if the string matches the regular expression *)
   val matches : t -> str -> bool
 
-  (* TODO add folding over splits? *)
   val split : ?max:int -> t -> str -> str list
   val split_delim : ?max:int -> t -> str -> [`Text of str | `Delim of str] list
+
+  val fold_split : t -> str -> init:'b -> f:('b -> str split_token -> 'b) -> 'b
+  val search_forward : ?start:int -> t -> str -> str substr option
 
   val fold_left_groups : t -> str -> init:'a -> f:('a -> Group.t -> 'a) ->'a
   val find_groups : t -> str -> Group.t list
