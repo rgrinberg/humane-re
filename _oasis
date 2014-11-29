@@ -16,6 +16,7 @@ Library humane_re
 Executable test1
   Path:               lib_test
   MainIs:             test1.ml
+  Build$:             flag(tests)
   Custom:             true
   CompiledObject:     best
   Install:            false
@@ -24,6 +25,7 @@ Executable test1
 Executable test_blog_post
   Path:               lib_test
   MainIs:             test_blog_post.ml
+  Build$:             flag(tests)
   Custom:             true
   CompiledObject:     best
   Install:            false
@@ -32,7 +34,9 @@ Executable test_blog_post
 Test test_blog_post
   Command:            $test_blog_post
   WorkingDirectory:   lib_test
+  Run$:               flag(tests)
 
 Test test1
   Command:            $test1
   WorkingDirectory:   lib_test
+  Run$:               flag(tests)
