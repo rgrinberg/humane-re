@@ -2,7 +2,8 @@ open OUnit2
 
 module Str = Humane_re.Str
 
-let printer strings = "[" ^ (String.concat " " strings) ^ "]"
+let quote s = "\"" ^ s ^ "\""
+let printer strings = "[" ^ (String.concat " " (List.map quote strings)) ^ "]"
 
 let test_split_simple _ =
   let re = Str.regexp "_\\| " in
@@ -41,6 +42,17 @@ let test_find_groups _ =
   ) in
   assert_equal s s'
 
+let test_fold_split1 _ =
+  let test_string = "test:123456 one:456 four:xxx" in
+  let re = Str.regexp "[: ]" in
+  let all_tokens = ["test"; "123456"; "one"; "456"; "four"; "xxx"] in
+  let fs = Str.fold_split re test_string ~init:[]
+             ~f:(fun acc t ->
+               match t with
+               | `Delim _ -> acc
+               | `Token sub -> (sub # str)::acc) in
+  assert_equal all_tokens fs ~printer
+
 let test_fixtures =
   "test Humane_re.Str" >:::
   [
@@ -48,6 +60,7 @@ let test_fixtures =
     "test find matches" >:: test_find_matches;
     "test find concat groups" >:: test_find_concat_groups;
     "test find groups" >:: test_find_groups;
+    "test fold split1" >:: test_fold_split1;
   ]
 
 let _ = run_test_tt_main test_fixtures
