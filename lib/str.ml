@@ -94,10 +94,6 @@ let split_delim ?(max=0) t text =
   split 0 max
 ;;
 
-let bool_of_option = function
-  | None -> false
-  | Some _ -> true
-
 let fold_split re text ~init ~f =
   let sub start end_ =
     object
