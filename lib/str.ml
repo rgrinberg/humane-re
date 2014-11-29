@@ -1,6 +1,6 @@
-module List = ListLabels
+module List   = ListLabels
 module String = StringLabels
-module Array = ArrayLabels
+module Array  = ArrayLabels
 
 type t = {
   re: Re.t;
@@ -75,7 +75,7 @@ let split ?(max=0) t text =
   if text = "" then [] else split 0 max
 ;;
 
-(* TODO not tail recursive *)
+(* Not tail recursive, since max is assumed to be small *)
 let split_delim ?(max=0) t text =
   let rec split start n =
     if start >= String.length text then [] else
@@ -92,6 +92,42 @@ let split_delim ?(max=0) t text =
       with Not_found ->
         [`Text (string_after text start)] in
   split 0 max
+;;
+
+let bool_of_option = function
+  | None -> false
+  | Some _ -> true
+
+let fold_split re text ~init ~f =
+  let find_first re position =
+    try
+      let token =
+        match search_forward re text position with
+        | None -> false
+        | Some _ -> true in
+      Some (token, search_forward_exn re text position)
+    with Not_found -> None (* List.find fails *)
+  in
+  let sub start end_ =
+    object
+      method pos = (start, end_)
+      method str = String.sub text ~pos:start ~len:(end_ - start)
+    end in
+  let rec split start acc =
+    if start >= String.length text then acc else
+      match find_first re start with
+      | None ->
+        let s = sub start (String.length text - 1) in
+        f acc (`Delim s)
+      | Some (token, (pos, match_end)) ->
+        let s = sub pos match_end in
+        if pos > start then
+          let str = `Token (sub start pos) in
+          let delim  = `Delim (s) in
+          split match_end (f (f acc delim) str)
+        else
+          split match_end (f acc (`Delim s))
+  in split 0 init
 ;;
 
 module Group = struct
@@ -204,16 +240,12 @@ let find_concat_groups t str =
   |> List.map ~f:Group.all
   |> List.concat
 
-module Search = struct
-  type re = t
-  type str = string
-  let forward ?(start=0) re str =
-    try
-      let res = Re.exec ~pos:start (get_srch re) str in
-      Some (object (self)
-        val pos = Re.get_ofs res 0
-        method pos = pos
-        method str = String.sub str ~pos:(fst pos) ~len:((snd pos) - (fst pos))
-      end)
-    with Not_found -> None
-end
+let search_forward ?(start=0) re str =
+  try
+    let res = Re.exec ~pos:start (get_srch re) str in
+    Some (object (self)
+      val pos = Re.get_ofs res 0
+      method pos = pos
+      method str = String.sub str ~pos:(fst pos) ~len:((snd pos) - (fst pos))
+    end)
+  with Not_found -> None
