@@ -99,15 +99,6 @@ let bool_of_option = function
   | Some _ -> true
 
 let fold_split re text ~init ~f =
-  let find_first re position =
-    try
-      let token =
-        match search_forward re text position with
-        | None -> false
-        | Some _ -> true in
-      Some (token, search_forward_exn re text position)
-    with Not_found -> None (* List.find fails *)
-  in
   let sub start end_ =
     object
       method pos = (start, end_)
@@ -115,11 +106,11 @@ let fold_split re text ~init ~f =
     end in
   let rec split start acc =
     if start >= String.length text then acc else
-      match find_first re start with
+      match search_forward re text start with
       | None ->
-        let s = sub start (String.length text - 1) in
-        f acc (`Delim s)
-      | Some (token, (pos, match_end)) ->
+        let s = sub start (String.length text) in
+        f acc (`Token s)
+      | Some (pos, match_end) ->
         let s = sub pos match_end in
         if pos > start then
           let str = `Token (sub start pos) in

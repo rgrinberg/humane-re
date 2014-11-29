@@ -50,7 +50,7 @@ let test_fold_split1 _ =
              ~f:(fun acc t ->
                match t with
                | `Delim _ -> acc
-               | `Token sub -> (sub # str)::acc) in
+               | `Token sub -> (sub # str)::acc) |> List.rev in
   assert_equal all_tokens fs ~printer
 
 let test_fixtures =
