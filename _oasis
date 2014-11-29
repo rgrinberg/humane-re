@@ -29,6 +29,10 @@ Executable test_blog_post
   Install:            false
   BuildDepends:       humane_re, oUnit
 
-Test test1
+Test test_blog_post
   Command:            $test_blog_post
+  WorkingDirectory:   lib_test
+
+Test test1
+  Command:            $test1
   WorkingDirectory:   lib_test
