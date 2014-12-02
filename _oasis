@@ -8,35 +8,35 @@ Plugins:     META (0.4)
 BuildTools: ocamlbuild
 
 Library humane_re
-  Path:       lib
+  Path:         lib
   BuildDepends: re, re.emacs
-  Pack:       true
-  Modules: S, Str
+  Pack:         true
+  Modules:      S, Str
 
 Executable test1
-  Path:               lib_test
-  MainIs:             test1.ml
-  Build$:             flag(tests)
-  Custom:             true
-  CompiledObject:     best
-  Install:            false
-  BuildDepends:       humane_re, oUnit
+  Path:           lib_test
+  MainIs:         test1.ml
+  Build$:         flag(tests)
+  Custom:         true
+  CompiledObject: best
+  Install:        false
+  BuildDepends:   humane_re, oUnit
 
 Executable test_blog_post
-  Path:               lib_test
-  MainIs:             test_blog_post.ml
-  Build$:             flag(tests)
-  Custom:             true
-  CompiledObject:     best
-  Install:            false
-  BuildDepends:       humane_re, oUnit
+  Path:           lib_test
+  MainIs:         test_blog_post.ml
+  Build$:         flag(tests)
+  Custom:         true
+  CompiledObject: best
+  Install:        false
+  BuildDepends:   humane_re, oUnit
 
 Test test_blog_post
-  Command:            $test_blog_post
-  WorkingDirectory:   lib_test
-  Run$:               flag(tests)
+  Command:          $test_blog_post
+  WorkingDirectory: lib_test
+  Run$:             flag(tests)
 
 Test test1
-  Command:            $test1
-  WorkingDirectory:   lib_test
-  Run$:               flag(tests)
+  Command:          $test1
+  WorkingDirectory: lib_test
+  Run$:             flag(tests)
