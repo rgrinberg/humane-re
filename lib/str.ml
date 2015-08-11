@@ -111,7 +111,7 @@ let fold_split re text ~init ~f =
         if pos > start then
           let str = `Token (sub start pos) in
           let delim  = `Delim (s) in
-          split match_end (f (f acc delim) str)
+          split match_end (f (f acc str) delim)
         else
           split match_end (f acc (`Delim s))
   in split 0 init
