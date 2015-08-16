@@ -53,6 +53,15 @@ let test_fold_split1 _ =
                | `Token sub -> (sub # str)::acc) |> List.rev in
   assert_equal all_tokens fs ~printer
 
+let test_bug_1 _ =
+  let re = Humane_re.Str.regexp "x" in
+  let res =
+    Humane_re.Str.fold_split re "axbxc" ~init:[] ~f:(fun acc ->
+      function
+      | `Delim s
+      | `Token s -> s#str :: acc) in
+  assert_equal ["c"; "x"; "b"; "x"; "a"] res ~printer
+
 let test_fixtures =
   "test Humane_re.Str" >:::
   [
@@ -61,6 +70,7 @@ let test_fixtures =
     "test find concat groups" >:: test_find_concat_groups;
     "test find groups" >:: test_find_groups;
     "test fold split1" >:: test_fold_split1;
+    "test bug 1 - fold split" >:: test_bug_1
   ]
 
 let _ = run_test_tt_main test_fixtures
