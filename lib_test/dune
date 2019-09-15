@@ -1,0 +1,9 @@
+(test
+  (name test1)
+  (modules test1)
+  (libraries humane_re oUnit))
+
+(test
+  (name test_blog_post)
+  (modules test_blog_post)
+  (libraries humane_re oUnit))

@@ -12,10 +12,13 @@ module type Group = sig
 
   (** Extract the group at [index] if it exists. *)
   val group : t -> index -> str option
+
   (** Same as [group] but raises [Not_found] if group is not matched *)
   val group_exn : t -> index -> str
+
   (** Extracts the group position if it exists *)
   val group_pos : t -> index -> (int * int) option
+
   (** The most general group extraction. Returns the string and the position
       if it exists *)
   val group_substr : t -> index -> (str substr) option
@@ -25,25 +28,30 @@ module type Group = sig
 
   (** Return all matched strings in the order they were matched *)
   val all : t -> str list
+
   (** Return all matched strings with the group names that were matched. *)
   val alli : t -> (index * str) list
 
   (** Return the string encompassing the full match *)
   val full_match : t -> str
+
   (** Return the position encompassing the full match *)
   val full_match_pos : t -> int * int
 end
 
 module type Re = sig
   type t (** The type of regular expression *)
+
   type str (** The type of string we match on *)
 
   module Group : Group with type str = str
 
   (** Compile a regular expression from a string *)
   val regexp : string -> t
+
   (** quote [str] returns a regular expression that matches [str] literally *)
   val quote : str -> t
+
   (** return true if the string matches the regular expression *)
   val matches : t -> str -> bool
 

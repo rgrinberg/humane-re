@@ -1,0 +1,6 @@
+(library
+  (name humane_re)
+  (public_name humane_re)
+  (modules s str)
+  (modules_without_implementation s)
+  (libraries re re.emacs))

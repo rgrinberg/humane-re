@@ -1,2 +1,0 @@
-#!/bin/sh
-opam install -y oasis ounit ocamlfind re
