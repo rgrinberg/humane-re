@@ -11,7 +11,7 @@ type t = {
 type str = string
 
 let regexp s =
-  { re = Re_emacs.re ~case:true s;
+  { re = Re.Emacs.re ~case:true s;
     mtch = None;
     srch = None }
 
@@ -45,7 +45,7 @@ module Infix = struct
   let (=~) s re = matches re s
 end
 
-let string_after s n = String.sub s n (String.length s - n)
+let string_after s n = String.sub s ~pos:n ~len:(String.length s - n)
 
 let rec get_srch re =
   match re.srch with
@@ -56,7 +56,7 @@ let rec get_srch re =
 (* searches forward and  *)
 let search_forward_exn re s p =
   let res = Re.exec ~pos:p (get_srch re) s in
-  Re.get_ofs res 0
+  Re.Group.offset res 0
 
 let search_forward re s p =
   try Some (search_forward_exn re s p)
@@ -69,7 +69,7 @@ let split ?(max=0) t text =
     if n = 1 then [string_after text start] else
       try
         let (pos, match_end) = search_forward_exn t text start in
-        String.sub text start (pos-start) :: split match_end (n-1)
+        String.sub text ~pos:start ~len:(pos-start) :: split match_end (n-1)
       with Not_found ->
         [string_after text start] in
   if text = "" then [] else split 0 max
@@ -82,9 +82,9 @@ let split_delim ?(max=0) t text =
     if n = 1 then [`Text (string_after text start)] else
       try
         let (pos, match_end) = search_forward_exn t text start in
-        let s = String.sub text pos (match_end - pos) in
+        let s = String.sub text ~pos:pos ~len:(match_end - pos) in
         if pos > start then
-          `Text (String.sub text start (pos-start)) ::
+          `Text (String.sub text ~pos:start ~len:(pos-start)) ::
           `Delim (s) ::
           split match_end (n-1)
         else
@@ -173,7 +173,7 @@ module Group = struct
     | Some x -> x
     | _ -> invalid_arg "some_exn"
 
-  let fold_left ({ string ; matches } as t) ~init ~f =
+  let fold_left ({matches; _ } as t) ~init ~f =
     let acc = ref init in
     for i = 1 to Array.length matches - 1 do
       let pos = matches.(i) in
@@ -199,8 +199,8 @@ let fold_left_groups t str ~init ~f =
   let rec loop acc pos =
     try
       let res = Re.exec ~pos (get_srch t) str in
-      let (_, new_pos) = Re.get_ofs res 0 in
-      let match_t = res |> Re.get_all_ofs |> Group.of_offsets str in
+      let (_, new_pos) = Re.Group.offset res 0 in
+      let match_t = res |> Re.Group.all_offset |> Group.of_offsets str in
       loop (f acc match_t) new_pos
     with Not_found -> acc
   in loop init 0
@@ -230,8 +230,8 @@ let find_concat_groups t str =
 let search_forward ?(start=0) re str =
   try
     let res = Re.exec ~pos:start (get_srch re) str in
-    Some (object (self)
-      val pos = Re.get_ofs res 0
+    Some (object (_)
+      val pos = Re.Group.offset res 0
       method pos = pos
       method str = String.sub str ~pos:(fst pos) ~len:((snd pos) - (fst pos))
     end)
